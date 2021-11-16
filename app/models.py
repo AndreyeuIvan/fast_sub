@@ -1,7 +1,7 @@
 from .db import Base
 
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.sql.sqltypes import TIMESTAMP, LargeBinary
+from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
 from sqlalchemy.orm import relationship, backref
 
@@ -12,7 +12,7 @@ class Serial(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    photo = Column(LargeBinary)
+    photo_path = Column(String)
     owner_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     owner = relationship('User')
 

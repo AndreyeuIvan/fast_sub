@@ -5,6 +5,9 @@ from shutil import copy
 from .. import schemas, models
 from ..db import get_db
 
+import uuid
+
+
 router = APIRouter(
     prefix="/serial",
     tags=['serial']
@@ -14,13 +17,15 @@ router = APIRouter(
 @router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_serial(name: str = Form(...), description: str = Form(...), owner_id: int = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):
     """Creates serial for user"""
-    with open(file.filename, 'wb'):
-        copy(file.filename, 'app/upload_files/')
+    path = 'upload_files/'
+    file.filename = f'{name}{file.filename[file.filename.rindex("."):]}'
+    with open(file.filename, 'wb') as f:
+        copy(file.filename, path)
     serialize = schemas.SerialS(name=name, description=description, owner_id=owner_id)
-    new_ser = models.Serial(name=serialize.name, description=serialize.description, photo=file.read(), owner_id=serialize.owner_id)
+    new_ser = models.Serial(name=serialize.name, description=serialize.description, photo_path=path + file.filename, owner_id=serialize.owner_id)
     db.add(new_ser)
     db.commit()
-    db.refresh(new_ser)
+    #db.refresh(new_ser)
     return {'message': "serial has been created"}
 
 
